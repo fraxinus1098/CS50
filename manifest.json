@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "Claude Prompting Tips",
+    "version": "1.0.0",
+    "description": "Basic official prompting tips for Claude",
+    "permissions": ["activeTab"],
+    "content_scripts": [
+        {
+          "matches": ["https://claude,ai/*"],
+          "css": ["styles.css"],
+          "js": ["content.js"]
+        }
+    ]
+},
