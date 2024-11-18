@@ -1,10 +1,81 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Sidepanel</title>
-  </head>
+    <title>Claude Prompt Tips</title>
+  <style>
+    body{
+        font-family: Arial, sans-serif;
+        padding: 16px;
+        margin: 0;
+        background: #fff;
+    }
+    
+    /* Overall sidepanel info and strucutre - From Google Chrome Extension's API dev page https://developer.chrome.com/docs/extensions/reference/api/sidePanel?hl=en */
+    /* tip button */
+    .tip-content {
+        margin-bottom: 16px;
+    }
+
+    .tip-button {
+        width: 100%;
+        padding: 12px;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 16px;
+        transition-duration: 0.4s;
+    }
+
+    .tip-button:hover {
+        background: #e9ecef;
+    }
+
+    .tip-content {
+        display: none;
+        padding: 16px;
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        margin-top: 8px;
+        font-size: 16px;
+        line-height: 2;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .tip-content.active {
+        display: block;
+    }
+
+    /* copy button IF TIME PERMITS */
+
+    /* scrollbar - From Google Chrome Extension's API dev page https://developer.chrome.com/docs/css-ui/scrollbar-styling?hl=en */
+    .scroller::-webkit-scrollbar-thumb {
+        background: transparent;
+    }
+
+    .scroller::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .scroller:hover::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-color-thumb);
+    }
+
+    .scroller:hover::-webkit-scrollbar-track {
+        background: var(--scrollbar-color-track);
+    }
+
+    .scroller:hover {
+        --fix: ; /* This custom property invalidates styles on hover, thereby enforcing a style recomputation. This is needed to work around a bug in Safari. */
+    }
+  </style>
+</head>
   <body>
-    <h1>All sites sidepanel extension</h1>
-    <p>This side panel is enabled on all sites</p>
+    <h2>Claude Promp Tips</h2>
+    <div id="tips-container"></div>
+    <script src="sideanel.js"></script>
   </body>
 </html>
