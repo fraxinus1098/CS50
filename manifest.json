@@ -3,12 +3,17 @@
     "name": "Claude Prompting Tips",
     "version": "1.0.0",
     "description": "Basic official prompting tips for Claude",
-    "permissions": ["activeTab"],
-    "content_scripts": [
-        {
-          "matches": ["https://claude,ai/*"],
-          "css": ["styles.css"],
-          "js": ["content.js"]
-        }
+    "side_panel": {
+      "default_path": "sidepanel.html"
+    },
+    "permissions": [
+      "activeTab",
+      "sidePanel"
+    ],
+    "action": {
+        "default_title": "Claude Prompting Tips"
+    },
+    "host_permissions": [
+      "https://claude,ai/*"
     ]
-},
+}
