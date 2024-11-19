@@ -3,7 +3,7 @@
 const tips = [
     {
         title: "Be clear, direct, and detailed",
-        Content: `Your task is to anonymize customer feedback for our quarterly review.
+        content: `Your task is to anonymize customer feedback for our quarterly review.
         
         Instructions:
         1. Replace all customer names with “CUSTOMER_[ID]” (e.g., “Jane Doe” → “CUSTOMER_001”).
@@ -18,46 +18,46 @@ const tips = [
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 
     {
         title: "X",
-        Content: 'X'
+        content: 'X'
     },
 ];
 
-document.addEventListener('DomContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const container=document.getElementById('tips-container');
 
     tips.forEach((tip) => {
@@ -65,12 +65,12 @@ document.addEventListener('DomContentLoaded', () => {
         tipDiv.className = 'tip-container';
 
         const button = document.createElement('button');
-        tipDiv.className = 'tip-button';
+        button.className = 'tip-button';
         button.textContent = tip.title;
 
         const content = document.createElement('div');
-        tipDiv.className = 'tip-content';
-        button.textContent = tip.content;
+        content.className = 'tip-content';
+        content.textContent = tip.content;
 
         button.addEventListener('click', () => {
             const wasActive = content.classList.contains('active');
@@ -81,8 +81,8 @@ document.addEventListener('DomContentLoaded', () => {
                 content.classList.add('active');
             }
         });
-    })
-    tipDiv.appendChild(button);
-    tipDiv.appendChild(content);
-    container.appendChild(tipDiv);
+        tipDiv.appendChild(button);
+        tipDiv.appendChild(content);
+        container.appendChild(tipDiv);
+    });
 });
