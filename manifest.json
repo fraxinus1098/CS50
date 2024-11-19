@@ -14,6 +14,6 @@
         "default_title": "Claude Prompting Tips"
     },
     "host_permissions": [
-      "https://claude,ai/*"
+      "https://claude.ai/*"
     ]
 }
