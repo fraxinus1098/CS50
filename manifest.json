@@ -4,18 +4,19 @@
   "version": "1.0.0",
   "description": "Basic official prompting tips for Claude with AI-powered prompt enhancement",
   "side_panel": {
-      "default_path": "sidepanel.html"
+    "default_path": "sidepanel.html"
   },
   "permissions": [
-      "activeTab",
-      "sidePanel",
-      "storage"
+    "activeTab",
+    "sidePanel",
+    "storage",
+    "cors"
   ],
-  "action": {
-      "default_title": "Claude Prompting Tips"
-  },
   "host_permissions": [
-      "https://claude.ai/*",
-      "https://api-inference.huggingface.co/*"
-  ]
+    "https://claude.ai/*",
+    "https://api-inference.huggingface.co/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://api-inference.huggingface.co;"
+  }
 }

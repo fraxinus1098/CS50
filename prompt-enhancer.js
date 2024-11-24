@@ -100,13 +100,13 @@ Enhanced prompt:`;
             this.updateApiStatus('Please save your API key first', 'error');
             return;
         }
-
+    
         const originalPrompt = document.getElementById('original-prompt').value;
         if (!originalPrompt) {
             this.updateApiStatus('Please enter a prompt to enhance', 'error');
             return;
         }
-
+    
         const loadingSpinner = document.getElementById('loading-spinner');
         const enhancedContainer = document.querySelector('.enhanced-prompt-container');
         
@@ -115,6 +115,7 @@ Enhanced prompt:`;
             enhancedContainer.style.display = 'none';
             
             const instruction = this.constructPromptTemplate(originalPrompt);
+            
             const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-xl', {
                 method: 'POST',
                 headers: {
@@ -131,20 +132,50 @@ Enhanced prompt:`;
                     }
                 })
             });
-
+    
+            // New logging for response status
+            console.log('Enhance Prompt Response:', {
+                status: response.status,
+                statusText: response.statusText
+            });
+    
+            const responseText = await response.text();
+            console.log('Raw API Response:', responseText);
+    
             if (!response.ok) {
-                throw new Error('API request failed');
+                throw new Error(`API request failed with status ${response.status}: ${responseText}`);
             }
-
-            const result = await response.json();
+    
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                throw new Error(`Failed to parse API response: ${responseText}`);
+            }
+    
+            if (!Array.isArray(result) || !result[0]?.generated_text) {
+                throw new Error(`Invalid response format: ${JSON.stringify(result)}`);
+            }
+    
             const enhancedPrompt = result[0].generated_text;
-            
             document.getElementById('enhanced-prompt').textContent = enhancedPrompt;
             enhancedContainer.style.display = 'block';
             this.updateApiStatus('Prompt enhanced successfully', 'success');
+            
         } catch (error) {
-            console.error('Error enhancing prompt:', error);
-            this.updateApiStatus('Error enhancing prompt', 'error');
+            console.error('Detailed error:', error);
+            
+            if (error.message.includes('Failed to fetch')) {
+                this.updateApiStatus('Network error: Please check your internet connection', 'error');
+            } else if (error.message.includes('401')) {
+                this.updateApiStatus('Invalid API key or unauthorized access', 'error');
+            } else if (error.message.includes('429')) {
+                this.updateApiStatus('Rate limit exceeded. Please try again later', 'error');
+            } else if (error.message.includes('503')) {
+                this.updateApiStatus('Model is currently loading. Please try again in a moment', 'error');
+            } else {
+                this.updateApiStatus(`Error: ${error.message}`, 'error');
+            }
         } finally {
             loadingSpinner.style.display = 'none';
         }
@@ -163,7 +194,76 @@ Enhanced prompt:`;
             console.error('Error copying to clipboard:', error);
         }
     }
+
+    async testApiKey() {
+        try {
+          const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-xl', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              inputs: 'Test prompt',
+              parameters: {
+                max_length: 10
+              }
+            })
+          });
+    
+          // Log the response for debugging
+          console.log('API Test Response:', {
+            status: response.status,
+            statusText: response.statusText
+          });
+    
+          const responseText = await response.text();
+          console.log('API Test Response Text:', responseText);
+    
+          if (!response.ok) {
+            throw new Error(`API key test failed with status ${response.status}: ${responseText}`);
+          }
+    
+          return true;
+        } catch (error) {
+          console.error('API key test failed:', error);
+          return false;
+        }
+      }
+    
+    // Update the saveApiKey method to test the key immediately
+    async saveApiKey() {
+        const apiKey = document.getElementById('hf-api-key').value;
+        
+        if (!apiKey) {
+          this.updateApiStatus('Please enter an API key', 'error');
+          return;
+        }
+    
+        // Validate API key format
+        if (!apiKey.startsWith('hf_')) {
+          this.updateApiStatus('Invalid API key format. Key should start with "hf_"', 'error');
+          return;
+        }
+    
+        try {
+          this.apiKey = apiKey;
+          const isValid = await this.testApiKey();
+          
+          if (!isValid) {
+            throw new Error('Invalid API key');
+          }
+    
+          await chrome.storage.local.set({ 'hf_api_key': apiKey });
+          this.updateApiStatus('API key verified and saved successfully', 'success');
+        } catch (error) {
+          console.error('Error saving API key:', error);
+          this.updateApiStatus(`Error: ${error.message}`, 'error');
+          this.apiKey = null;
+        }
+      }
 }
+
 
 // Initialize the prompt enhancer when the document loads
 document.addEventListener('DOMContentLoaded', () => {
