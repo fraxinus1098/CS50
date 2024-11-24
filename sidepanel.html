@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
   <title>Claude Prompting Tips</title>
   <style>
     body {
@@ -83,6 +84,48 @@
 
     .tip-content::-webkit-scrollbar-thumb:hover {
       background: #adb5bd;
+    }
+
+    .category-container {
+    margin-bottom: 16px;
+    }
+    
+    .category-button {
+    width: 100%;
+    padding: 12px;
+    background: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background 0.2s;
+    }
+
+    .category-button:hover {
+    background: #dee2e6;
+    }
+
+    .subtips-container {
+    display: none;
+    padding: 8px 0 8px 16px;
+    }
+
+    .subtips-container.active {
+    display: block;
+    }
+
+    /* Update existing tip-button styles */
+    .tip-button {
+    background: #f8f9fa;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 8px;
+    }
+
+    .tip-content {
+    margin-left: -16px; /* Adjust content alignment with parent container */
     }
   </style>
 </head>
