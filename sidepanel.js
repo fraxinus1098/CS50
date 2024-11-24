@@ -44,6 +44,7 @@ const tips = [
         {
           title: "Incident Response",
           content: `Analyze this AcmeCloud outage report. Skip the preamble. Keep your response terse and write only the bare bones necessary information. List only:
+  
   1) Cause
   2) Duration
   3) Impacted services
@@ -66,7 +67,8 @@ const tips = [
 Input: The new dashboard is a mess! It takes forever to load, and I can’t find the export button. Fix this ASAP!
 Category: UI/UX, Performance
 Sentiment: Negative
-Priority: High</example>
+Priority: High
+</example>
 
 Now, analyze this feedback: {{FEEDBACK}}`
           },
@@ -92,9 +94,33 @@ Why not let Claude think?
 2. Not all tasks require in-depth thinking. Use CoT judiciously to ensure the right balance of performance and latency.`
           },
           {
-            title: "Your Subtip 2",
-            content: `Your content here`
-          }
+            title: "Writing Donor Emails (Structured Guided CoT)",
+            content: `	Draft personalized emails to donors asking for contributions to this year’s Care for Kids program.
+
+Program information:
+<program>
+{{PROGRAM_DETAILS}}
+</program>
+
+Donor information:
+<donor>
+{{DONOR_DETAILS}}
+</donor>
+
+Think before you write the email in <thinking> tags.
+First, think through what messaging might appeal to this donor given their donation history and which campaigns they’ve supported in the past.
+Then, think through what aspects of the Care for Kids program would appeal to them, given their history.
+Finally, write the personalized donor email in <email> tags, using your analysis.`
+          },
+          {
+            title: "Financial Analysis With Thinking",
+            content: `You’re a financial advisor. A client wants to invest $10,000. They can choose between two options:
+            
+            A) A stock that historically returns 12% annually but is volatile, or
+            B) A bond that guarantees 6% annually.
+            The client needs the money in 5 years for a down payment on a house. Which option do you recommend?
+            Think step-by-step.`
+          },
         ]
     },
     {
