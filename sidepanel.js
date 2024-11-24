@@ -5,12 +5,12 @@ const tips = [
       content: `Your task is to anonymize customer feedback for our quarterly review.
 
 Instructions:
-1. Replace all customer names with “CUSTOMER_[ID]” (e.g., “Jane Doe” → “CUSTOMER_001”).
-2. Replace email addresses with “EMAIL_[ID]@example.com”.
-3. Redact phone numbers as “PHONE_[ID]“.
-4. If a message mentions a specific product (e.g., “AcmeCloud”), leave it intact.
+1. Replace all customer names with "CUSTOMER_[ID]" (e.g., "Jane Doe" → "CUSTOMER_001").
+2. Replace email addresses with "EMAIL_[ID]@example.com".
+3. Redact phone numbers as "PHONE_[ID]".
+4. If a message mentions a specific product (e.g., "AcmeCloud"), leave it intact.
 5. If no PII is found, copy the message verbatim.
-6. Output only the processed messages, separated by ”---“.
+6. Output only the processed messages, separated by "---".
 
 Data to process: {{FEEDBACK_DATA}}`
     },
@@ -88,49 +88,75 @@ Here’s the report: {{REPORT}}`
   ];
   
   document.addEventListener('DOMContentLoaded', () => {
+    // Ensure proper character encoding in the HTML file
+    const meta = document.createElement('meta');
+    meta.setAttribute('charset', 'UTF-8');
+    document.head.appendChild(meta);
+
     const container = document.getElementById('tips-container');
     
     tips.forEach((tip) => {
-      const tipDiv = document.createElement('div');
-      tipDiv.className = 'tip-container';
-      
-      const button = document.createElement('button');
-      button.className = 'tip-button';
-      button.textContent = tip.title;
-      
-      const content = document.createElement('div');
-      content.className = 'tip-content';
-      content.textContent = tip.content;
-      
-      const copyButton = document.createElement('button');
-      copyButton.className = 'copy-button';
-      copyButton.textContent = 'Copy to Clipboard';
-      
-      button.addEventListener('click', () => {
-        const wasActive = content.classList.contains('active');
-        document.querySelectorAll('.tip-content').forEach(el => {
-          el.classList.remove('active');
+        const tipDiv = document.createElement('div');
+        tipDiv.className = 'tip-container';
+        
+        const button = document.createElement('button');
+        button.className = 'tip-button';
+        // Use textContent for proper encoding of special characters
+        button.textContent = decodeEntities(tip.title);
+        
+        const content = document.createElement('div');
+        content.className = 'tip-content';
+        // Use innerHTML with sanitization for formatted text
+        content.innerHTML = sanitizeHTML(decodeEntities(tip.content));
+        
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-button';
+        copyButton.textContent = 'Copy to Clipboard';
+        
+        button.addEventListener('click', () => {
+            const wasActive = content.classList.contains('active');
+            document.querySelectorAll('.tip-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            if (!wasActive) {
+                content.classList.add('active');
+            }
         });
-        if (!wasActive) {
-          content.classList.add('active');
-        }
-      });
-      
-      copyButton.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(tip.content);
-          copyButton.textContent = 'Copied!';
-          setTimeout(() => {
-            copyButton.textContent = 'Copy to Clipboard';
-          }, 2000);
-        } catch (err) {
-          console.error('Failed to copy text: ', err);
-        }
-      });
-      
-      content.appendChild(copyButton);
-      tipDiv.appendChild(button);
-      tipDiv.appendChild(content);
-      container.appendChild(tipDiv);
+        
+        copyButton.addEventListener('click', async () => {
+            try {
+                // Ensure proper encoding when copying to clipboard
+                await navigator.clipboard.writeText(decodeEntities(tip.content));
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy to Clipboard';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+        });
+        
+        content.appendChild(copyButton);
+        tipDiv.appendChild(button);
+        tipDiv.appendChild(content);
+        container.appendChild(tipDiv);
     });
-  });
+});
+
+// Helper function to decode HTML entities
+function decodeEntities(text) {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+}
+
+// Helper function to sanitize HTML content
+function sanitizeHTML(text) {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/\n/g, '<br>');
+}
