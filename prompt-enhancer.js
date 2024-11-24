@@ -116,7 +116,7 @@ Enhanced prompt:`;
             
             const instruction = this.constructPromptTemplate(originalPrompt);
             
-            const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-xl', {
+            const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.apiKey}`,
@@ -197,7 +197,7 @@ Enhanced prompt:`;
 
     async testApiKey() {
         try {
-          const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-xl', {
+          const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${this.apiKey}`,
