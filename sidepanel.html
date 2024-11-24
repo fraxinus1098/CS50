@@ -1,81 +1,94 @@
+// sidepanel.html
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Claude Prompt Tips</title>
+<head>
+  <title>Claude Prompting Tips</title>
   <style>
-    body{
-        font-family: Arial, sans-serif;
-        padding: 16px;
-        margin: 0;
-        background: #fff;
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 16px;
+      margin: 0;
+      background: #fff;
     }
-    
-    /* Overall sidepanel info and strucutre - From Google Chrome Extension's API dev page https://developer.chrome.com/docs/extensions/reference/api/sidePanel?hl=en */
-    /* tip button */
+
     .tip-container {
-        margin-bottom: 16px;
+      margin-bottom: 16px;
     }
 
     .tip-button {
-        width: 100%;
-        padding: 12px;
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        cursor: pointer;
-        text-align: center;
-        font-size: 16px;
-        transition-duration: 0.4s;
+      width: 100%;
+      padding: 12px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
     }
 
     .tip-button:hover {
-        background: #e9ecef;
+      background: #e9ecef;
     }
 
     .tip-content {
-        display: none;
-        padding: 16px;
-        background: #ffffff;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        margin-top: 8px;
-        font-size: 16px;
-        line-height: 2;
-        max-height: 400px;
-        overflow-y: auto;
+      display: none;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
     }
 
     .tip-content.active {
-        display: block;
+      display: block;
     }
 
-    /* copy button IF TIME PERMITS */
-
-    /* scrollbar - From Google Chrome Extension's API dev page https://developer.chrome.com/docs/css-ui/scrollbar-styling?hl=en */
-    .scroller::-webkit-scrollbar-thumb {
-        background: transparent;
+    .copy-button {
+      background: #228be6;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 12px;
+      transition: background 0.2s;
     }
 
-    .scroller::-webkit-scrollbar-track {
-        background: transparent;
+    .copy-button:hover {
+      background: #1971c2;
     }
 
-    .scroller:hover::-webkit-scrollbar-thumb {
-        background: var(--scrollbar-color-thumb);
+    /* Scrollbar styling */
+    .tip-content::-webkit-scrollbar {
+      width: 8px;
     }
 
-    .scroller:hover::-webkit-scrollbar-track {
-        background: var(--scrollbar-color-track);
+    .tip-content::-webkit-scrollbar-track {
+      background: #f1f3f5;
+      border-radius: 4px;
     }
 
-    .scroller:hover {
-        --fix: ; /* This custom property invalidates styles on hover, thereby enforcing a style recomputation. This is needed to work around a bug in Safari. */
+    .tip-content::-webkit-scrollbar-thumb {
+      background: #ced4da;
+      border-radius: 4px;
+    }
+
+    .tip-content::-webkit-scrollbar-thumb:hover {
+      background: #adb5bd;
     }
   </style>
 </head>
-  <body>
-    <h2>Claude Prompt Tips</h2>
-    <div id="tips-container"></div>
-    <script src="sidepanel.js"></script>
-  </body>
+<body>
+  <h2>Claude Prompting Tips</h2>
+  <div id="tips-container"></div>
+  <script src="sidepanel.js"></script>
+</body>
 </html>
