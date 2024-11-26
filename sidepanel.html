@@ -205,6 +205,24 @@
         .api-status.error {
             color: #fa5252;
         }
+
+        .enhanced-prompt-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-top: 12px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .api-usage-info {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
   </style>
 </head>
 <body>
@@ -230,6 +248,19 @@
             <div id="enhanced-prompt" class="tip-content"></div>
             <button class="copy-button" id="copy-enhanced">Copy Enhanced Prompt</button>
         </div>
+    </div>
+
+    <div class="enhanced-prompt-section">
+      <h4>Enhanced Prompt</h4>
+      <textarea 
+        id="enhanced-prompt-textarea" 
+        class="enhanced-prompt-textarea" 
+        placeholder="Enhanced prompt will appear here..." 
+        rows="10"
+      ></textarea>
+      <div class="api-usage-info">
+        <span id="api-calls-remaining">API Calls Remaining: Checking...</span>
+      </div>
     </div>
 
     <script src="prompt-enhancer.js"></script>

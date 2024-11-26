@@ -22,8 +22,14 @@ const CLAUDE_BEST_PRACTICES = {
 
 class PromptEnhancer {
     constructor() {
-        this.apiKey = null;
-        this.initialize();
+      this.apiKey = null;
+      this.initialize();
+    }
+  
+    async initialize() {
+      this.setupEventListeners();
+      await this.loadApiKey();
+      await this.checkApiUsage();
     }
 
     async initialize() {
@@ -40,35 +46,67 @@ class PromptEnhancer {
     }
 
     async loadApiKey() {
-        try {
-            const result = await chrome.storage.local.get('hf_api_key');
-            if (result.hf_api_key) {
-                this.apiKey = result.hf_api_key;
-                document.getElementById('hf-api-key').value = '********';
-                this.updateApiStatus('API key loaded', 'success');
-            }
-        } catch (error) {
-            console.error('Error loading API key:', error);
-            this.updateApiStatus('Error loading API key', 'error');
-        }
-    }
+      try {
+          const result = await chrome.storage.sync.get('hf_api_key');
+          if (result.hf_api_key) {
+              this.apiKey = result.hf_api_key;
+              document.getElementById('hf-api-key').value = '********';
+              this.updateApiStatus('API key loaded', 'success');
+              await this.checkApiUsage();
+          }
+      } catch (error) {
+          console.error('Error loading API key:', error);
+          this.updateApiStatus('Error loading API key', 'error');
+          this.apiKey = null;
+      }
+  }
 
-    async saveApiKey() {
+      async saveApiKey() {
         const apiKey = document.getElementById('hf-api-key').value;
+        
         if (!apiKey) {
-            this.updateApiStatus('Please enter an API key', 'error');
-            return;
+          this.updateApiStatus('Please enter an API key', 'error');
+          return;
         }
-
+    
         try {
-            await chrome.storage.local.set({ 'hf_api_key': apiKey });
+          // Test the API key before saving
+          const isValid = await this.testApiKey(apiKey);
+          if (isValid) {
+            await chrome.storage.sync.set({ 'hf_api_key': apiKey });
             this.apiKey = apiKey;
             this.updateApiStatus('API key saved successfully', 'success');
+            await this.checkApiUsage();
+          } else {
+            throw new Error('Invalid API key');
+          }
         } catch (error) {
-            console.error('Error saving API key:', error);
-            this.updateApiStatus('Error saving API key', 'error');
+          console.error('Error saving API key:', error);
+          this.updateApiStatus('Error saving API key: ' + error.message, 'error');
         }
-    }
+      }
+
+      async checkApiUsage() {
+        if (!this.apiKey) return;
+    
+        try {
+          const response = await fetch('https://api-inference.huggingface.co/status', {
+            headers: {
+              'Authorization': `Bearer ${this.apiKey}`
+            }
+          });
+    
+          const remainingCalls = response.headers.get('X-RateLimit-Remaining') || 'Unknown';
+          const totalCalls = response.headers.get('X-RateLimit-Limit') || 'Unknown';
+          
+          document.getElementById('api-calls-remaining').textContent = 
+            `API Calls: ${remainingCalls}/${totalCalls}`;
+        } catch (error) {
+          console.error('Error checking API usage:', error);
+          document.getElementById('api-calls-remaining').textContent = 
+            'Could not fetch API usage';
+        }
+      }
 
     updateApiStatus(message, type) {
         const statusEl = document.getElementById('api-status');
@@ -109,13 +147,12 @@ Enhanced prompt:`;
     
         const loadingSpinner = document.getElementById('loading-spinner');
         const enhancedContainer = document.querySelector('.enhanced-prompt-container');
-        
+        const enhancedTextarea = document.getElementById('enhanced-prompt-textarea');
+    
         try {
             loadingSpinner.style.display = 'block';
             enhancedContainer.style.display = 'none';
-            
-            const instruction = this.constructPromptTemplate(originalPrompt);
-            
+    
             const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
                 method: 'POST',
                 headers: {
@@ -123,7 +160,7 @@ Enhanced prompt:`;
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    inputs: instruction,
+                    inputs: this.constructPromptTemplate(originalPrompt),
                     parameters: {
                         max_length: 1000,
                         temperature: 0.7,
@@ -133,54 +170,26 @@ Enhanced prompt:`;
                 })
             });
     
-            // New logging for response status
-            console.log('Enhance Prompt Response:', {
-                status: response.status,
-                statusText: response.statusText
-            });
-    
-            const responseText = await response.text();
-            console.log('Raw API Response:', responseText);
-    
             if (!response.ok) {
-                throw new Error(`API request failed with status ${response.status}: ${responseText}`);
+                throw new Error(`API request failed with status ${response.status}`);
             }
     
-            let result;
-            try {
-                result = JSON.parse(responseText);
-            } catch (e) {
-                throw new Error(`Failed to parse API response: ${responseText}`);
-            }
-    
-            if (!Array.isArray(result) || !result[0]?.generated_text) {
-                throw new Error(`Invalid response format: ${JSON.stringify(result)}`);
-            }
-    
+            const result = await response.json();
             const enhancedPrompt = result[0].generated_text;
-            document.getElementById('enhanced-prompt').textContent = enhancedPrompt;
+    
+            enhancedTextarea.value = enhancedPrompt;
             enhancedContainer.style.display = 'block';
+            
+            await this.checkApiUsage();
             this.updateApiStatus('Prompt enhanced successfully', 'success');
-            
         } catch (error) {
-            console.error('Detailed error:', error);
-            
-            if (error.message.includes('Failed to fetch')) {
-                this.updateApiStatus('Network error: Please check your internet connection', 'error');
-            } else if (error.message.includes('401')) {
-                this.updateApiStatus('Invalid API key or unauthorized access', 'error');
-            } else if (error.message.includes('429')) {
-                this.updateApiStatus('Rate limit exceeded. Please try again later', 'error');
-            } else if (error.message.includes('503')) {
-                this.updateApiStatus('Model is currently loading. Please try again in a moment', 'error');
-            } else {
-                this.updateApiStatus(`Error: ${error.message}`, 'error');
-            }
+            console.error('Error:', error);
+            this.updateApiStatus(`Error: ${error.message}`, 'error');
         } finally {
             loadingSpinner.style.display = 'none';
         }
     }
-
+    
     async copyEnhancedPrompt() {
         const enhancedPrompt = document.getElementById('enhanced-prompt').textContent;
         try {
@@ -195,73 +204,73 @@ Enhanced prompt:`;
         }
     }
 
-    async testApiKey() {
-        try {
+    async testApiKey(keyToTest) {
+      try {
           const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-large', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${this.apiKey}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              inputs: 'Test prompt',
-              parameters: {
-                max_length: 10
-              }
-            })
+              method: 'POST',
+              headers: {
+                  'Authorization': `Bearer ${keyToTest}`,
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  inputs: 'Test prompt',
+                  parameters: {
+                      max_length: 10
+                  }
+              })
           });
-    
-          // Log the response for debugging
-          console.log('API Test Response:', {
-            status: response.status,
-            statusText: response.statusText
-          });
-    
-          const responseText = await response.text();
-          console.log('API Test Response Text:', responseText);
-    
-          if (!response.ok) {
-            throw new Error(`API key test failed with status ${response.status}: ${responseText}`);
+  
+          // If we get a 503, it means the model is loading - this is actually okay!
+          if (response.status === 503) {
+              const data = await response.json();
+              // This means the API key is valid, but model needs loading
+              console.log('Model is loading:', data);
+              return true;
           }
-    
+  
+          if (!response.ok) {
+              const responseText = await response.text();
+              throw new Error(`API key test failed with status ${response.status}: ${responseText}`);
+          }
+  
           return true;
-        } catch (error) {
+      } catch (error) {
           console.error('API key test failed:', error);
-          return false;
-        }
+          throw error;
       }
+  }
     
     // Update the saveApiKey method to test the key immediately
     async saveApiKey() {
-        const apiKey = document.getElementById('hf-api-key').value;
-        
-        if (!apiKey) {
+      const apiKeyInput = document.getElementById('hf-api-key').value.trim();
+      
+      if (!apiKeyInput) {
           this.updateApiStatus('Please enter an API key', 'error');
           return;
-        }
-    
-        // Validate API key format
-        if (!apiKey.startsWith('hf_')) {
+      }
+  
+      // Validate API key format
+      if (!apiKeyInput.startsWith('hf_')) {
           this.updateApiStatus('Invalid API key format. Key should start with "hf_"', 'error');
           return;
-        }
-    
-        try {
-          this.apiKey = apiKey;
-          const isValid = await this.testApiKey();
+      }
+  
+      try {
+          // Test the API key before saving or updating this.apiKey
+          await this.testApiKey(apiKeyInput);
           
-          if (!isValid) {
-            throw new Error('Invalid API key');
-          }
-    
-          await chrome.storage.local.set({ 'hf_api_key': apiKey });
+          // Only save and update if validation passed
+          await chrome.storage.sync.set({ 'hf_api_key': apiKeyInput });
+          this.apiKey = apiKeyInput;
+          
           this.updateApiStatus('API key verified and saved successfully', 'success');
-        } catch (error) {
+          await this.checkApiUsage();
+      } catch (error) {
           console.error('Error saving API key:', error);
           this.updateApiStatus(`Error: ${error.message}`, 'error');
           this.apiKey = null;
-        }
       }
+  }
 }
 
 
