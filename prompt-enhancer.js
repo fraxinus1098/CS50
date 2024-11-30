@@ -275,8 +275,8 @@ ${originalPrompt}
                   inputs: this.constructPromptTemplate(originalPrompt),
                   parameters: {
                       max_length: 512,
-                      temperature: 0.5,
-                      top_p: 0.9,
+                      temperature: 0.1,
+                      top_p: 0.3,
                       do_sample: true
                   }
               })
