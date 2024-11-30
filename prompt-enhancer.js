@@ -129,8 +129,8 @@ Enhanced prompt:`;
               body: JSON.stringify({
                   inputs: this.constructPromptTemplate(originalPrompt),
                   parameters: {
-                      max_length: 1000,
-                      temperature: 0.7,
+                      max_length: 512,
+                      temperature: 0,
                       top_p: 0.9,
                       do_sample: true
                   }
