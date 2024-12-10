@@ -2,6 +2,8 @@
 
 A Chrome extension that provides a helpful side panel with prompting tips and an AI-powered prompt enhancement feature when using Claude.ai.
 
+Final video here https://youtu.be/Ujc2bc8jHME
+
 ## Features
 
 ### 1. Prompting Tips Side Panel
