@@ -1,3 +1,8 @@
+/**
+ * Manages prompt enhancement functionality using Hugging Face's API
+ * Handles API key storage, validation, and prompt processing
+ */
+
 class PromptEnhancer {
     constructor() {
       this.apiKey = null;
@@ -58,6 +63,12 @@ class PromptEnhancer {
       }
     }
   
+    /**
+      * Constructs a template for prompt enhancement
+      * @param {string} originalPrompt - The user's input prompt
+      * @returns {string} - Formatted template for the model
+      */
+
     constructPromptTemplate(originalPrompt) {
       // Simplified template that focuses on direct enhancement
       return `Please enhance this prompt to make it more effective and detailed:
@@ -74,6 +85,12 @@ class PromptEnhancer {
   Return only the enhanced prompt with no additional text or explanations.
   
   Enhanced prompt:`;
+
+  /**
+     * Processes the prompt through Hugging Face's API
+     * Handles loading states, API calls, and response processing
+     * @returns {Promise<void>}
+     */
     }
   
     async enhancePrompt() {

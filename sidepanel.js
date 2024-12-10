@@ -1,4 +1,9 @@
 // sidepanel.js
+/**
+ * Tips data structure for prompting guidelines
+ * Each category contains subtips with title and content
+ */
+
 const tips = [
     {
       title: "Be Clear, direct, and detailed",
@@ -434,7 +439,11 @@ Find quotes from the patient records and appointment history that are relevant t
         ]
     },
   ];
-  
+  /**
+     * Initializes the side panel UI
+     * Creates category containers, buttons, and content areas
+     * Sets up event listeners for user interactions
+     */
   document.addEventListener('DOMContentLoaded', () => {
     const meta = document.createElement('meta');
     meta.setAttribute('charset', 'UTF-8');
@@ -517,7 +526,10 @@ Find quotes from the patient records and appointment history that are relevant t
       container.appendChild(categoryDiv);
     });
   });
-  
+  /**
+   * Utility functions for text processing
+   * Handles HTML entity decoding and content sanitization
+   */
   function decodeEntities(text) {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = text;
